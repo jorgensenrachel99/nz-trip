@@ -102,6 +102,11 @@ h1{font-family:"Bagel Fat One",Georgia,serif;font-weight:400;font-size:clamp(28p
 .card{border-radius:16px;padding:9px 14px;background:var(--paper);min-height:44px}
 .card p{margin:0;font-weight:600}
 .card small{display:block;color:var(--ink-2);font-size:13px;font-weight:500;margin-top:1px}
+.card a,.sleep a{color:inherit;text-decoration:underline;text-decoration-color:var(--pounamu);text-decoration-thickness:2px;text-underline-offset:3px}
+.card a:hover{color:var(--pounamu)}
+.sleep a{text-decoration-color:var(--kowhai)}
+.ext{font-size:.8em;color:var(--pounamu);text-decoration:none;display:inline-block}
+.sleep .ext{color:var(--kowhai)}
 .badge{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:2px}
 .booked .e{border-color:var(--pounamu)}
 .booked .badge{background:var(--pounamu);color:#fff}
@@ -211,7 +216,31 @@ function drawDay(d){legsG.innerHTML='';pinsG.innerHTML='';
   applyScale();zoomTo(d.box)}
 
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const LBL={b:'Booked',i:'Idea'};const MODE={drive:['🚗','Drive'],ferry:['⛴️','Ferry'],fly:['✈️','Fly']};
+const LBL={b:'Booked',i:'Idea'};
+const LINKS={
+'2|Breakfast at Giraffe, Viaduct Harbour':'https://www.viaduct.co.nz/eat-and-drink/giraffe',
+'3|Piha Canyon, full day':'https://awoladventures.co.nz/',
+'3|Kitekite Falls walk':'https://www.alltrails.com/trail/new-zealand/auckland/kitekite-falls-path',
+'3|Piha black-sand beach':'https://www.tripadvisor.com/Attraction_Review-g1852281-d1148203-Reviews-Piha_Beach-Piha_North_Island.html',
+'4|Birthday dinner at Gramados':'https://www.gramadosrestaurant.co.nz/',
+'5|Pelorus Bridge river swim':'https://pictonparadise.co.nz/pelorus-bridge-scenic-reserve-day-trip-from-picton/',
+'6|Crayfish at Nin’s Bin':'https://www.ninsbin.co.nz/about',
+'7|Swim with dolphins':'https://www.dolphinencounter.co.nz/',
+'7|Whale watching cruise':'https://www.getyourguide.com/kaikoura-l37419/kaikoura-2-hour-whale-watching-cruise-t226204/',
+'8|Patagonia Chocolates':'https://www.patagoniachocolates.co.nz/',
+'9|Bike the Arrow River Trail':'https://www.arrowtown.com/see-do/biking/',
+'9|Afternoon at Ayrburn':'https://thebestofnewzealand.com/activities/ayrburn-arrowtown-the-perfect-day-trip-from-queenstown/',
+'10|Dart River jet boat safari':'https://www.dartriver.co.nz/',
+'10|Shotover Jet':'https://www.getyourguide.com/queenstown-l498/queenstown-shotover-river-extreme-jet-boat-experience-t109951/',
+'10|Walter Peak Gourmet BBQ':'https://www.realnz.com/en/experiences/tss-earnslaw-walter-peak-experiences/walter-peak-gourmet-bbq-dining/',
+'11|Wildwire via ferrata':'https://www.wildwire.co.nz/climb#wild-thing',
+'12|Kiwi hatchery tour':'https://maps.app.goo.gl/7ZLRBFVd11DfkM7j9',
+'13|Zorbing':'https://zorb.com/',
+'13|Raft the Kaituna':'https://kaitunacascades.co.nz/',
+'13|Canopy ziplining':'https://www.rotoruaziplines.nz/',
+'14|Black water rafting':'https://www.waitomo.com/black-water-rafting'};
+const SLINKS={'Kaikōura White Morph':'https://kaikourawhitemorph.co.nz/','Focus Motel and Exec Suites':'https://focusmotel.co.nz/','Habeke Haven':'https://www.booking.com/hotel/nz/the-habeke-haven.html'};
+const lk=(u,txt)=>u?`<a href="${u}" target="_blank" rel="noopener">${txt}<span class="ext" aria-label="(opens in new tab)"> ↗</span></a>`:txt;const MODE={drive:['🚗','Drive'],ferry:['⛴️','Ferry'],fly:['✈️','Fly']};
 function render(i){cur=i;const d=DAYS[i];
   strip.querySelectorAll('.pill').forEach((b,j)=>b.setAttribute('aria-current',j===i));
   strip.children[i].scrollIntoView({inline:'center',block:'nearest',behavior:reduce?'auto':'smooth'});
@@ -220,10 +249,10 @@ function render(i){cur=i;const d=DAYS[i];
   panel.innerHTML=`<div class="head"><div class="num">${d.n}</div><div><div class="date">${d.date}${d.tag?' '+d.tag:''}</div><h1>${esc(d.title)}</h1></div></div>
   <p class="where">${esc(d.where)}</p>
   ${d.warn?`<p class="warn">⚠️ ${d.warn}</p>`:''}
-  <div class="sleep"><span class="ico">${d.sleep[3]||'🛏️'}</span><div><strong>${esc(d.sleep[0])}</strong>${d.sleep[1]?`<small>${esc(d.sleep[1])}</small>`:''}</div>${d.sleep[2]?`<span class="st ${d.sleep[2]==='ok'?'ok':'todo'}">${d.sleep[2]==='ok'?'Booked':'To book'}</span>`:''}</div>
+  <div class="sleep"><span class="ico">${d.sleep[3]||'🛏️'}</span><div><strong>${lk(SLINKS[d.sleep[0]],esc(d.sleep[0]))}</strong>${d.sleep[1]?`<small>${esc(d.sleep[1])}</small>`:''}</div>${d.sleep[2]?`<span class="st ${d.sleep[2]==='ok'?'ok':'todo'}">${d.sleep[2]==='ok'?'Booked':'To book'}</span>`:''}</div>
   <ol class="agenda">${d.items.map(it=>it==='or'?`<li class="it"><span></span><span></span><span class="or">or</span></li>`:
    it.tr!=null?(l=>`<li class="it travel"><span class="t">${it.t}</span><span class="e" aria-hidden="true">${MODE[l.m][0]}</span><div class="card"><p>${MODE[l.m][1]} to ${nm(l.b)} <b class="dur">${l.t}</b></p></div></li>`)(d.legs[it.tr]):
-   `<li class="it ${({b:'booked',m:'maybe',i:'idea',n:'note'})[it[4]]||''}"><span class="t">${it[0]||''}</span><span class="e" aria-hidden="true">${it[1]}</span><div class="card"><p>${esc(it[2])}${LBL[it[4]]?`<span class="badge">${LBL[it[4]]}</span>`:''}${it[5]?` <b class="dur">${it[5]}</b>`:''}</p>${it[3]?`<small>${esc(it[3])}</small>`:''}</div></li>`).join('')}</ol>`}
+   `<li class="it ${({b:'booked',m:'maybe',i:'idea',n:'note'})[it[4]]||''}"><span class="t">${it[0]||''}</span><span class="e" aria-hidden="true">${it[1]}</span><div class="card"><p>${lk(LINKS[d.n+'|'+it[2]],esc(it[2]))}${LBL[it[4]]?`<span class="badge">${LBL[it[4]]}</span>`:''}${it[5]?` <b class="dur">${it[5]}</b>`:''}</p>${it[3]?`<small>${esc(it[3])}</small>`:''}</div></li>`).join('')}</ol>`}
   panel.insertAdjacentHTML('beforeend',`<div class="nav"><button id="prev" ${i===0?'disabled':''}>‹ ${i>1?'Day '+(i-1):'Overview'}</button><button id="next" ${i===DAYS.length-1?'disabled':''}>${i===0?'Start with Day 1':'Day '+(i+1)} ›</button></div>`);
   $('#prev').onclick=()=>go(i-1);$('#next').onclick=()=>go(i+1);
   drawDay(d);
